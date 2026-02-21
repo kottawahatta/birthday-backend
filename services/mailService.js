@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
 
+
 const transporter = nodemailer.createTransport({
   host: "smtp-relay.brevo.com",
   port: 587,
@@ -19,7 +20,6 @@ const sendBirthdayWish = async (user) => {
       <div style="padding: 30px; line-height: 1.6; color: #333;">
         <p>Hi ${user.name},</p>
         <p>Wishing you a day filled with happiness and a year filled with joy. Happy Birthday from all of us!</p>
-        <p>Stay amazing!</p>
         <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
           <p style="margin: 0; font-weight: bold; color: #ff4757;">KottawaHatta Team</p>
         </div>
@@ -40,7 +40,7 @@ const sendBirthdayReminder = async (recipient, birthdayPerson) => {
       <h3 style="color: #2f3542;">🎂 Birthday Reminder</h3>
       <p>Hi ${recipient.name},</p>
       <p>Today is <b>${birthdayPerson.name}'s</b> birthday!</p>
-      <p>Don't forget to reach out and send your best wishes.</p>
+      <p>Don't forget to send your best wishes.</p>
       <p>Best regards,<br>KottawaHatta Bot</p>
     </div>`;
 

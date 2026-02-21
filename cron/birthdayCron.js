@@ -3,8 +3,7 @@ const User = require('../models/User');
 const { Op } = require('sequelize');
 const { sendBirthdayWish, sendBirthdayReminder } = require('../services/mailService');
 
-
-cron.schedule('13 23 * * *', async () => {
+cron.schedule('25 23 * * *', async () => {
   console.log('🎂 Cron Job: Checking for birthdays...');
   try {
     const today = new Date();
@@ -22,11 +21,8 @@ cron.schedule('13 23 * * *', async () => {
 
     if (birthdayPeople.length > 0) {
       console.log(`🎉 Found ${birthdayPeople.length} birthday(s) today.`);
-      
       for (const bPerson of birthdayPeople) {
         console.log(`📧 Sending emails for: ${bPerson.name}`);
-        
-        
         await sendBirthdayWish(bPerson);
         
         const others = allUsers.filter(u => u.id !== bPerson.id);
