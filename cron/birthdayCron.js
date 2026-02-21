@@ -3,24 +3,31 @@ const User = require('../models/User');
 const { Op } = require('sequelize');
 const { sendBirthdayWish, sendBirthdayReminder } = require('../services/mailService');
 
-cron.schedule('30 18 * * *', async () => {
+
+cron.schedule('55 19 * * *', async () => {
   console.log('🎂 Cron Job: Checking for birthdays...');
   try {
     const today = new Date();
+    
     const month = String(today.getMonth() + 1).padStart(2, '0');
     const day = String(today.getDate()).padStart(2, '0');
-    const searchDate = `-${month}-${day}`;
+    const searchDate = `${month}-${day}`; 
 
     
-    const birthdayPeople = await User.findAll({
-      where: { birthday: { [Op.cast]: 'text' }, [Op.iLike]: `%${searchDate}` }
+    const allUsers = await User.findAll();
+    
+    
+    const birthdayPeople = allUsers.filter(user => {
+      if (!user.birthday) return false;
+      const bDayStr = String(user.birthday); 
+      return bDayStr.includes(searchDate);
     });
 
     if (birthdayPeople.length > 0) {
-      const allUsers = await User.findAll();
+      console.log(`🎉 Found ${birthdayPeople.length} birthday(s) today.`);
       
       for (const bPerson of birthdayPeople) {
-        console.log(`🎉 Found birthday: ${bPerson.name}`);
+        console.log(`📧 Sending emails for: ${bPerson.name}`);
         
         
         await sendBirthdayWish(bPerson);
@@ -31,14 +38,14 @@ cron.schedule('30 18 * * *', async () => {
           await sendBirthdayReminder(member, bPerson);
         }
       }
-      console.log('✅ Cron job: Birthday emails and reminders processed.');
+      console.log('✅ Cron job: All emails processed successfully.');
     } else {
-      console.log('😴 Cron job: No birthdays found today.');
+      console.log('😴 Cron job: No birthdays found for today.');
     }
   } catch (error) {
     console.error('❌ Cron Job Error:', error.message);
   }
 }, {
   scheduled: true,
-  timezone: "Asia/Colombo" 
+  timezone: "Asia/Colombo"
 });
