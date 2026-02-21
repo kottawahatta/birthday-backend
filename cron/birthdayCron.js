@@ -3,8 +3,8 @@ const User = require('../models/User');
 const { Op } = require('sequelize');
 const { sendBirthdayWish, sendBirthdayReminder } = require('../services/mailService');
 
-// සෑම දිනකම රාත්‍රී 10:45 ට ක්‍රියාත්මක වේ
-cron.schedule('47 22 * * *', async () => {
+
+cron.schedule('13 23 * * *', async () => {
   console.log('🎂 Cron Job: Checking for birthdays...');
   try {
     const today = new Date();
@@ -22,16 +22,19 @@ cron.schedule('47 22 * * *', async () => {
 
     if (birthdayPeople.length > 0) {
       console.log(`🎉 Found ${birthdayPeople.length} birthday(s) today.`);
+      
       for (const bPerson of birthdayPeople) {
         console.log(`📧 Sending emails for: ${bPerson.name}`);
-        await sendBirthdayWish(bPerson).catch(e => console.error(`Failed to send wish: ${e.message}`));
+        
+        
+        await sendBirthdayWish(bPerson);
         
         const others = allUsers.filter(u => u.id !== bPerson.id);
         for (const member of others) {
-          await sendBirthdayReminder(member, bPerson).catch(e => console.error(`Failed to send reminder: ${e.message}`));
+          await sendBirthdayReminder(member, bPerson);
         }
       }
-      console.log('✅ Cron job execution finished.');
+      console.log('✅ Cron job: All emails processed successfully.');
     } else {
       console.log('😴 Cron job: No birthdays found for today.');
     }
@@ -40,5 +43,5 @@ cron.schedule('47 22 * * *', async () => {
   }
 }, {
   scheduled: true,
-  timezone: "Asia/Colombo"
+  timezone: "Asia/Colombo" 
 });
