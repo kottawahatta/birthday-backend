@@ -2,18 +2,19 @@ const nodemailer = require("nodemailer");
 
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
-  port: 465,
-  secure: true, 
+  port: 587,
+  secure: false, // Port 587 සඳහා false විය යුතුය
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
-  
-  connectionTimeout: 10000, 
-  greetingTimeout: 10000,
-  socketTimeout: 10000,
+  tls: {
+    rejectUnauthorized: false // Railway වැනි Cloud සර්වර් වලදී මෙය ඉතා වැදගත් වේ
+  },
+  connectionTimeout: 20000,
+  greetingTimeout: 20000,
+  socketTimeout: 20000,
 });
-
 
 const sendBirthdayWish = async (user) => {
   const html = `
@@ -23,8 +24,7 @@ const sendBirthdayWish = async (user) => {
       </div>
       <div style="padding: 30px; line-height: 1.6; color: #333;">
         <p>Hi ${user.name},</p>
-        <p>Wishing you a day filled with happiness and a year filled with joy. Happy Birthday from all of us!</p>
-        <p>Stay amazing!</p>
+        <p>Wishing you a day filled with happiness and a year filled with joy!</p>
         <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
           <p style="margin: 0; font-weight: bold; color: #ff4757;">KottawaHatta Team</p>
         </div>
@@ -39,14 +39,11 @@ const sendBirthdayWish = async (user) => {
   });
 };
 
-// Send Reminder to the rest of the friends
 const sendBirthdayReminder = async (recipient, birthdayPerson) => {
   const html = `
     <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #ddd; border-radius: 8px;">
       <h3 style="color: #2f3542;">🎂 Birthday Reminder</h3>
-      <p>Hi ${recipient.name},</p>
-      <p>Today is <b>${birthdayPerson.name}'s</b> birthday!</p>
-      <p>Don't forget to reach out and send your best wishes.</p>
+      <p>Hi ${recipient.name}, Today is <b>${birthdayPerson.name}'s</b> birthday!</p>
       <p>Best regards,<br>KottawaHatta Bot</p>
     </div>`;
 
