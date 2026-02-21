@@ -3,7 +3,7 @@ const User = require('../models/User');
 const { Op } = require('sequelize');
 const { sendBirthdayWish, sendBirthdayReminder } = require('../services/mailService');
 
-cron.schedule('25 23 * * *', async () => {
+cron.schedule('40 23 * * *', async () => {
   console.log('🎂 Cron Job: Checking for birthdays...');
   try {
     const today = new Date();
