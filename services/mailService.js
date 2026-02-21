@@ -3,17 +3,17 @@ const nodemailer = require("nodemailer");
 const transporter = nodemailer.createTransport({
   host: "smtp.gmail.com",
   port: 587,
-  secure: false, // Port 587 සඳහා false විය යුතුය
+  secure: false, // Port 587 සඳහා අනිවාර්යයෙන්ම false විය යුතුය
   auth: {
     user: process.env.EMAIL_USER,
     pass: process.env.EMAIL_PASS,
   },
   tls: {
-    rejectUnauthorized: false // Railway වැනි Cloud සර්වර් වලදී මෙය ඉතා වැදගත් වේ
+    rejectUnauthorized: false, // Security blocks මඟහැරීමට
+    minVersion: "TLSv1.2"
   },
-  connectionTimeout: 20000,
-  greetingTimeout: 20000,
-  socketTimeout: 20000,
+  connectionTimeout: 30000, // Timeout කාලය තව දුරටත් වැඩි කරන ලදී
+  greetingTimeout: 30000,
 });
 
 const sendBirthdayWish = async (user) => {
@@ -24,7 +24,7 @@ const sendBirthdayWish = async (user) => {
       </div>
       <div style="padding: 30px; line-height: 1.6; color: #333;">
         <p>Hi ${user.name},</p>
-        <p>Wishing you a day filled with happiness and a year filled with joy!</p>
+        <p>Wishing you a wonderful birthday filled with happiness!</p>
         <div style="margin-top: 30px; border-top: 1px solid #eee; padding-top: 20px;">
           <p style="margin: 0; font-weight: bold; color: #ff4757;">KottawaHatta Team</p>
         </div>

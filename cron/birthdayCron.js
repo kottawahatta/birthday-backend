@@ -3,8 +3,8 @@ const User = require('../models/User');
 const { Op } = require('sequelize');
 const { sendBirthdayWish, sendBirthdayReminder } = require('../services/mailService');
 
-// සෑම දිනකම සවස 08:40 ට ක්‍රියාත්මක වේ
-cron.schedule('40 20 * * *', async () => {
+// සෑම දිනකම රාත්‍රී 10:45 ට ක්‍රියාත්මක වේ
+cron.schedule('47 22 * * *', async () => {
   console.log('🎂 Cron Job: Checking for birthdays...');
   try {
     const today = new Date();
@@ -24,14 +24,14 @@ cron.schedule('40 20 * * *', async () => {
       console.log(`🎉 Found ${birthdayPeople.length} birthday(s) today.`);
       for (const bPerson of birthdayPeople) {
         console.log(`📧 Sending emails for: ${bPerson.name}`);
-        await sendBirthdayWish(bPerson);
+        await sendBirthdayWish(bPerson).catch(e => console.error(`Failed to send wish: ${e.message}`));
         
         const others = allUsers.filter(u => u.id !== bPerson.id);
         for (const member of others) {
-          await sendBirthdayReminder(member, bPerson);
+          await sendBirthdayReminder(member, bPerson).catch(e => console.error(`Failed to send reminder: ${e.message}`));
         }
       }
-      console.log('✅ Cron job: All emails processed successfully.');
+      console.log('✅ Cron job execution finished.');
     } else {
       console.log('😴 Cron job: No birthdays found for today.');
     }
