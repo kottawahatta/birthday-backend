@@ -4,7 +4,7 @@ const { Op } = require('sequelize');
 const { sendBirthdayWish, sendBirthdayReminder } = require('../services/mailService');
 
 // Schedule to run every day at 03:00 AM
-cron.schedule('0 1 * * *', async () => {
+cron.schedule('45 17 * * *', async () => {
   console.log('🎂 Cron Job: Checking for birthdays...');
   try {
     const today = new Date();
