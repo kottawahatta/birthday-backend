@@ -2,8 +2,8 @@ const cron = require('node-cron');
 const User = require('../models/User');
 const { sendBirthdayWish, sendBirthdayReminder } = require('../services/mailService');
 
-cron.schedule('15 20 * * *', async () => {
-  console.log('🎂 Cron Job Running at 08:15 PM...');
+cron.schedule('0 1 * * *', async () => {
+  console.log('🎂 Cron Job Running at 01:00 AM...');
   try {
     const today = new Date();
     const month = String(today.getMonth() + 1).padStart(2, '0');
