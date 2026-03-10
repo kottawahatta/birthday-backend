@@ -21,20 +21,11 @@ app.get('/test-email', async (req, res) => {
   console.log("--- 🔍 Manual Test Started ---");
   try {
     const today = new Date();
+    const month = String(today.getMonth() + 1).padStart(2, '0');
+    const day = String(today.getDate()).padStart(2, '0');
 
     const birthdayPeople = await User.findAll({
-      where: {
-        [Op.and]: [
-          sequelize.where(
-            sequelize.fn('EXTRACT', sequelize.literal('MONTH FROM birthday')),
-            today.getMonth() + 1
-          ),
-          sequelize.where(
-            sequelize.fn('EXTRACT', sequelize.literal('DAY FROM birthday')),
-            today.getDate()
-          )
-        ]
-      }
+      where: { birthday: { [Op.iLike]: `%-${month}-${day}` } }
     });
 
     console.log("Users found:", birthdayPeople.length);
