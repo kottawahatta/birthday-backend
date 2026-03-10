@@ -11,18 +11,24 @@ cron.schedule('15 20 * * *', async () => {
     const searchDate = `${month}-${day}`; 
 
     const allUsers = await User.findAll();
-    const birthdayPeople = allUsers.filter(user => 
-      user.birthday && String(user.birthday).includes(searchDate)
-    );
+    const birthdayPeople = allUsers.filter(user => {
+      if (!user.birthday) return false;
+      const bday = new Date(user.birthday);
+      return bday.getMonth() === today.getMonth() && bday.getDate() === today.getDate();
+    });
 
     if (birthdayPeople.length > 0) {
       for (const bPerson of birthdayPeople) {
         console.log(`📧 Sending emails for: ${bPerson.name}`);
-        await sendBirthdayWish(bPerson);
-        
-        const others = allUsers.filter(u => u.id !== bPerson.id);
-        for (const member of others) {
-          await sendBirthdayReminder(member, bPerson);
+        try {
+          await sendBirthdayWish(bPerson);
+          
+          const others = allUsers.filter(u => u.id !== bPerson.id);
+          for (const member of others) {
+            await sendBirthdayReminder(member, bPerson);
+          }
+        } catch (error) {
+          console.error(`❌ Error sending emails for ${bPerson.name}:`, error.message);
         }
       }
     } else {

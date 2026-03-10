@@ -18,7 +18,7 @@ const User = sequelize.define('User', {
     validate: { isEmail: true }
   },
   birthday: {
-    type: DataTypes.STRING, // Format: YYYY-MM-DD (e.g., 1997-09-26)
+    type: DataTypes.DATE, // Store as Date object
     allowNull: false
   }
 }, {
