@@ -2,11 +2,11 @@ const cron = require('node-cron');
 const User = require('../models/User');
 const { sendBirthdayWish, sendBirthdayReminder } = require('../services/mailService');
 
-console.log('🎂 Birthday Cron Job Loaded - Ready to run at 16:15 daily (Sri Lanka Time)');
+console.log('🎂 Birthday Cron Job Loaded - Ready to run at 17:30 daily (Sri Lanka Time)');
 
-cron.schedule('41 16 * * *', async () => { 
+cron.schedule('30 17 * * *', async () => { 
   console.log('===========================================');
-  console.log('🎂 Cron Job Running at 16:15 (Sri Lanka Time)...');
+  console.log('🎂 Cron Job Running at 17:30 (Sri Lanka Time)...');
   console.log('===========================================');
   try {
     const today = new Date();
