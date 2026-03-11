@@ -1,12 +1,12 @@
 const nodemailer = require("nodemailer");
 
-// Primary transporter (port 587)
+// Primary transporter (port 465)
 const createPrimaryTransporter = () => {
   return nodemailer.createTransport({
     service: "gmail",
     host: "smtp.gmail.com",
-    port: 587,
-    secure: false,
+    port: 465,
+    secure: true,
     auth: {
       user: process.env.EMAIL_USER,
       pass: process.env.EMAIL_PASS,
