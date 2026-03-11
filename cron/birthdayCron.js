@@ -4,7 +4,7 @@ const { sendBirthdayWish, sendBirthdayReminder } = require('../services/mailServ
 
 console.log('🎂 Birthday Cron Job Loaded - Ready to run at 16:15 daily (Sri Lanka Time)');
 
-cron.schedule('26 16 * * *', async () => { 
+cron.schedule('41 16 * * *', async () => { 
   console.log('===========================================');
   console.log('🎂 Cron Job Running at 16:15 (Sri Lanka Time)...');
   console.log('===========================================');

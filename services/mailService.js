@@ -1,19 +1,85 @@
 const nodemailer = require("nodemailer");
-const transporter = nodemailer.createTransport({
-  service: "gmail",
-  host: "smtp.gmail.com",
-  port: 587,
-  secure: false,
-  auth: {
-    user: process.env.EMAIL_USER,
-    pass: process.env.EMAIL_PASS,
-  },
-  connectionTimeout: 10000, // 10 seconds
-  socketTimeout: 15000, // 15 seconds
-  tls: {
-    rejectUnauthorized: false,
+
+// Try multiple SMTP configurations
+const createTransporter = () => {
+  // Option 1: Port 587 (STARTTLS)
+  const config1 = {
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 587,
+    secure: false,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+    connectionTimeout: 30000,
+    socketTimeout: 30000,
+    tls: {
+      rejectUnauthorized: false,
+    }
+  };
+
+  // Option 2: Port 465 (SSL)
+  const config2 = {
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+    connectionTimeout: 30000,
+    socketTimeout: 30000
+  };
+
+  return nodemailer.createTransport(config1);
+};
+
+const transporter = createTransporter();
+
+// Fallback transporter with different port
+const createFallbackTransporter = () => {
+  return nodemailer.createTransport({
+    service: "gmail",
+    host: "smtp.gmail.com",
+    port: 465,
+    secure: true,
+    auth: {
+      user: process.env.EMAIL_USER,
+      pass: process.env.EMAIL_PASS,
+    },
+    connectionTimeout: 30000,
+    socketTimeout: 30000
+  });
+};
+
+let currentTransporter = transporter;
+let useFallback = false;
+
+// Retry helper with exponential backoff and fallback
+const sendWithRetry = async (sendFn, retries = 3) => {
+  let lastError;
+  for (let i = 0; i < retries; i++) {
+    try {
+      return await sendFn();
+    } catch (error) {
+      lastError = error;
+      console.log(`⏳ Retry ${i + 1}/${retries}: ${error.message}`);
+      
+      // If timeout, try fallback transporter
+      if ((error.message.includes('timeout') || error.code === 'ECONNREFUSED') && !useFallback) {
+        console.log('🔄 Trying fallback SMTP configuration (port 465)...');
+        currentTransporter = createFallbackTransporter();
+        useFallback = true;
+        sendFn = () => sendFn(); // Recreate the send function with new transporter
+      }
+      
+      if (i < retries - 1) await new Promise(r => setTimeout(r, 3000 * (i + 1)));
+    }
   }
-});
+  throw lastError;
+};
 
 const sendBirthdayWish = async (user) => {
   try {
@@ -28,7 +94,7 @@ const sendBirthdayWish = async (user) => {
         </div>`
     };
 
-    await transporter.sendMail(mailOptions);
+    await sendWithRetry(() => currentTransporter.sendMail(mailOptions));
     console.log(`✅ Birthday wish sent to ${user.email}`);
   } catch (error) {
     console.error(`❌ Failed to send birthday wish to ${user.email}:`, error.message);
@@ -49,7 +115,7 @@ const sendBirthdayReminder = async (recipient, birthdayPerson) => {
         </div>`
     };
 
-    await transporter.sendMail(mailOptions);
+    await sendWithRetry(() => currentTransporter.sendMail(mailOptions));
     console.log(`✅ Birthday reminder sent to ${recipient.email}`);
   } catch (error) {
     console.error(`❌ Failed to send reminder to ${recipient.email}:`, error.message);
