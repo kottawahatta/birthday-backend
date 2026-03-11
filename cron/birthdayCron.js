@@ -2,8 +2,12 @@ const cron = require('node-cron');
 const User = require('../models/User');
 const { sendBirthdayWish, sendBirthdayReminder } = require('../services/mailService');
 
-cron.schedule('15 16 * * *', async () => { 
-  console.log('🎂 Cron Job Running at 01:00 AM...');
+console.log('🎂 Birthday Cron Job Loaded - Ready to run at 16:15 daily (Sri Lanka Time)');
+
+cron.schedule('26 16 * * *', async () => { 
+  console.log('===========================================');
+  console.log('🎂 Cron Job Running at 16:15 (Sri Lanka Time)...');
+  console.log('===========================================');
   try {
     const today = new Date();
     const month = String(today.getMonth() + 1).padStart(2, '0');
@@ -18,8 +22,9 @@ cron.schedule('15 16 * * *', async () => {
     });
 
     if (birthdayPeople.length > 0) {
+      console.log(`🎉 Found ${birthdayPeople.length} birthday(s) today!`);
       for (const bPerson of birthdayPeople) {
-        console.log(`📧 Sending emails for: ${bPerson.name}`);
+        console.log(`📧 Processing: ${bPerson.name} (${bPerson.email})`);
         try {
           await sendBirthdayWish(bPerson);
           
@@ -35,7 +40,8 @@ cron.schedule('15 16 * * *', async () => {
       console.log('😴 No birthdays found today.');
     }
   } catch (error) {
-    console.error('❌ Error:', error.message);
+    console.error('❌ Cron Job Error:', error.message);
+    console.error('Stack:', error.stack);
   }
 }, {
   scheduled: true,
